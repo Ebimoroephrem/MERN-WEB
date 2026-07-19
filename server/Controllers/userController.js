@@ -2,7 +2,6 @@ import userModel from '../Models/userModel.js';
 
 const getUserData = async (req, res) => {
     try {
-           console.log("req.userId :", req.userId);
         const userId = req.userId  // ✅ depuis middleware
 
         const userData = await userModel.findById(userId);
