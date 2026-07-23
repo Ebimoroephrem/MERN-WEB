@@ -5,15 +5,34 @@ import transporter from "../Config/nodemailler.js";
 import { PASSWORD_RESET_OTP_TEMPLATE, EMAIL_TEMPLATE } from "../Config/emailTemplate.js";
 
 const  registerUser = async (req,res)=>{
+
+    const isStrongPassword = (password) => {
+    const minLength = password.length >= 8
+    const hasUppercase = /[A-Z]/.test(password)
+    const hasLowercase = /[a-z]/.test(password)
+    const hasNumber = /[0-9]/.test(password)
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password)
+
+    return minLength && hasUppercase && hasLowercase && hasNumber && hasSpecial
+}
+     
     try{
+        
         const {name,email,password}= req.body;
         if(!name || !email || !password){
             return res.status(400).json({ success: false, message: "Veuillez remplir tous les champs"});
+        }
+        if (!isStrongPassword(password)) {
+            return res.status(400).json({
+                success: false,
+                message: "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial."
+            });
         }
         const existingUser = await userModel.findOne({email});
         if(existingUser){
             return res.status(400).json({success: false, message: "Cet email est déjà utilisé"});
         }
+        
         // Hash du mot de passe
         const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(password, salt);
