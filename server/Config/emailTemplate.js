@@ -190,7 +190,7 @@ export const PASSWORD_RESET_OTP_TEMPLATE = (name, otp) => `<!DOCTYPE html>
     </div>
 
     <div class="footer">
-      <p>© 2026 Ton Application - Tous droits réservés</p>
+      <p>© 2026 Dev Ephrem - Tous droits réservés</p>
       <p>Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.</p>
     </div>
   </div>
