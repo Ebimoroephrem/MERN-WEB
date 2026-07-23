@@ -14,15 +14,41 @@ const Login = () => {
     email:"",
     password:""
   });
+  const [passwordStrength, setPasswordStrength] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false
+  });
+  const checkPassword = (value) => {
+    setPasswordStrength({
+      length:    value.length >= 8,
+      uppercase: /[A-Z]/.test(value),
+      lowercase: /[a-z]/.test(value),
+      number:    /[0-9]/.test(value),
+      special:   /[!@#$%^&*(),.?":{}|<>]/.test(value)
+    })
+  }
+
   const handleChange = (e)=>{
     const {name,value} = e.target;
 
     setFormatData((prev)=>({
       ...prev,[name]:value
     }));
+    if (name === "password") checkPassword(value)  // ✅ check au changement
+  }
+  const isPasswordValid = () => {
+    return Object.values(passwordStrength).every(Boolean)
   }
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // ✅ Bloquer si mot de passe faible en Inscription
+    if (state === "Inscription" && !isPasswordValid()) {
+      toast.error("Le mot de passe ne respecte pas les critères de sécurité")
+      return
+    }
     try {
         axios.defaults.withCredentials = true;
 
@@ -85,13 +111,37 @@ const Login = () => {
             <img src={assets.lock_icon} alt="icon" />
             <input onChange={handleChange} value={formatData.password} name="password" className='bg-transparent outline-none w-full' type="password" placeholder='Mot de passe' required />
           </div>
+           {/*  Règles mot de passe — seulement en Inscription quand on tape */}
+          {state === "Inscription" && formatData.password && (
+            <div className='mb-4 px-2 flex flex-col gap-1'>
+              {[
+                { key: 'length',    label: '8 caractères minimum' },
+                { key: 'uppercase', label: 'Une lettre majuscule (A-Z)' },
+                { key: 'lowercase', label: 'Une lettre minuscule (a-z)' },
+                { key: 'number',    label: 'Un chiffre (0-9)' },
+                { key: 'special',   label: 'Un caractère spécial (!@#$%...)' },
+              ].map(({ key, label }) => (
+                <p key={key} className={`text-xs flex items-center gap-1 ${passwordStrength[key] ? 'text-green-400' : 'text-red-400'}`}>
+                  {passwordStrength[key] ? '✅' : '❌'} {label}
+                </p>
+              ))}
+            </div>
+          )}
 
           {/* Mot de passe oublié — seulement en Connexion */}
           {state === "Connexion" && (
             <p onClick={()=> navigate('/reset-password')} className='text-indigo-500 mb-5 cursor-pointer'>Mot de passe oublié ?</p>
           )}
 
-          <button className='font-medium w-full py-2.5 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-900 cursor-pointer text-white'>
+          {/*  Bouton désactivé si mot de passe invalide en Inscription */}
+          <button
+            disabled={state === "Inscription" && formatData.password && !isPasswordValid()}
+            className={`font-medium w-full py-2.5 rounded-full bg-gradient-to-br from-indigo-500 
+              to-indigo-900 text-white transition-all
+              ${state === "Inscription" && formatData.password && !isPasswordValid()
+                ? 'opacity-50 cursor-not-allowed'
+                : 'cursor-pointer hover:opacity-90'
+              }`}>
             {state}
           </button>
         </form>
