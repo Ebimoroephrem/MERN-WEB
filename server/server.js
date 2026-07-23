@@ -10,7 +10,7 @@ const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = ['http://localhost:5173']
+const allowedOrigins = ['http://localhost:5173', 'https://mern-web-96ig.onrender.com']
 
 app.use(cors({origin: allowedOrigins, credentials:true}));
 app.use(cookieParser());
