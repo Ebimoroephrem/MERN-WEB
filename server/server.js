@@ -6,16 +6,20 @@ import connectDB from './Config/DB.js';
 import authRouter from './Routes/authRoute.js';
 import userRouter from './Routes/userRoute.js';
 
-const app = express();
 dotenv.config();
+
+const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = ['http://localhost:5173', 'https://mern-web-96ig.onrender.com']
+const allowedOrigins = ['http://localhost:5173', 'https://fronent-auth.onrender.com']
 
 app.use(cors({origin: allowedOrigins, credentials:true}));
 app.use(cookieParser());
 app.use(express.json());
 // Point de terminaison de l'API
+app.get("/", (req, res) => {
+    res.send("API MERN fonctionne correctement 🚀");
+});
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 
